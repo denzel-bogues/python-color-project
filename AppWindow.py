@@ -11,24 +11,20 @@ blue = 0
 
 class Ui_MainWindow(object):
     def __init__(self, MainWindow):
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
+        self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
-        self.verticalLayoutWidget_2 = QtWidgets.QWidget(self.centralwidget)
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-
+        self.verticalLayoutWidget_2 = QtWidgets.QWidget(self.centralwidget)
         self.ConfirmButton = QtWidgets.QPushButton(self.centralwidget)
-        self.BlueValue = QtWidgets.QLabel(self.verticalLayoutWidget_2)
-        self.GreenValue = QtWidgets.QLabel(self.verticalLayoutWidget_2)
-        self.RedValue = QtWidgets.QLabel(self.verticalLayoutWidget_2)
-
-        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.verticalLayoutWidget_2)
-
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
         self.bluevalue_input = QtWidgets.QLineEdit(self.verticalLayoutWidget)
         self.greenvalue_input = QtWidgets.QLineEdit(self.verticalLayoutWidget)
         self.redvalue_input = QtWidgets.QLineEdit(self.verticalLayoutWidget)
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
-
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.verticalLayoutWidget_2)
+        self.BlueValue = QtWidgets.QLabel(self.verticalLayoutWidget_2)
+        self.GreenValue = QtWidgets.QLabel(self.verticalLayoutWidget_2)
+        self.RedValue = QtWidgets.QLabel(self.verticalLayoutWidget_2)
 
 
     def setupUi(self, MainWindow):
@@ -49,15 +45,18 @@ class Ui_MainWindow(object):
 
         self.redvalue_input.setObjectName("redvalue_input")
         self.verticalLayout.addWidget(self.redvalue_input)
-        # red = self.redvalue_input.text()
+      #  if self.redvalue_input.isModified() == False:
+        #    self.redvalue_input.setText("-1")
 
         self.greenvalue_input.setObjectName("greenvalue_input")
         self.verticalLayout.addWidget(self.greenvalue_input)
-        # green = self.greenvalue_input.text()
+      #  if self.greenvalue_input.isModified() == False:
+       #     self.greenvalue_input.setText("-1")
 
         self.bluevalue_input.setObjectName("bluevalue_input")
         self.verticalLayout.addWidget(self.bluevalue_input)
-        # blue = self.bluevalue_input.text()
+      #  if self.bluevalue_input.isModified() == False:
+      #      self.bluevalue_input.setText("-1")
 
         self.verticalLayoutWidget_2.setGeometry(QtCore.QRect(60, 0, 100, 80))
         self.verticalLayoutWidget_2.setObjectName("verticalLayoutWidget_2")
@@ -73,6 +72,7 @@ class Ui_MainWindow(object):
         self.BlueValue.setObjectName("BlueValue")
         self.verticalLayout_2.addWidget(self.BlueValue)
 
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 254, 18))
         self.menubar.setObjectName("menubar")
@@ -83,6 +83,11 @@ class Ui_MainWindow(object):
 
         self.ConfirmButton.setGeometry(QtCore.QRect(61, 85, 181, 21))
         self.ConfirmButton.setObjectName("ConfirmButton")
+
+        """ self.ConfirmButton.setDisabled(True)
+        if self.bluevalue_input.isModified() == True and self.redvalue_input.isModified() == True and self.greenvalue_input.isModified() == True:
+            self.ConfirmButton.setEnabled(True)
+        """
         self.ConfirmButton.clicked.connect(lambda: self.backend_stuff())
 
         self.retranslateUi(MainWindow)
@@ -96,28 +101,37 @@ class Ui_MainWindow(object):
         self.GreenValue.setText(_translate("MainWindow", "Green Value"))
         self.BlueValue.setText(_translate("MainWindow", "Blue Value"))
 
-    def get_input(self):
-        print('value: ' + self.redvalue_input.text())
 
     def backend_stuff(self):
-        data_read = p.read_csv("colors.csv", delimiter=',', names=['Color names', 'Hex', 'R', 'G', 'B', ])
+        data_read = p.read_csv("colors.csv", delimiter=',', names=['Color names', 'Hex', 'R', 'G', 'B'])
         # data_red = data_read[['R', 'G', 'B']]
-        R = self.redvalue_input.text()
-        G = self.greenvalue_input.text()
-        B = self.bluevalue_input.text()
 
-        userdata = [R, G, B]
-        user_df = p.DataFrame(userdata)
-        in_read = p.DataFrame.transpose(p.DataFrame(user_df))
-        in_read.columns = ['R', 'G', 'B']
+        if self.redvalue_input.text() != "-1":
+            R = int(self.redvalue_input.text())
 
-        in_read['R'] = in_read['R'].astype(int)
-        in_read['G'] = in_read['G'].astype(int)
-        in_read['B'] = in_read['B'].astype(int)
+        if self.greenvalue_input.text() != "-1":
+            G = int(self.greenvalue_input.text())
 
-        desired_df = p.merge(data_read, in_read, on=['R', 'G', 'B'], how='inner')
-        print(desired_df['names'])
+        if self.bluevalue_input.text() != "-1":
+            B = int(self.bluevalue_input.text())
+
+
+        if R >= 0 and G >= 0 and B >= 0:
+            userdata = [R, G, B]
+
+            user_df = p.DataFrame(userdata)
+
+            in_read = p.DataFrame.transpose(p.DataFrame(user_df))
+            in_read.columns = ['R', 'G', 'B']
         
+            desired_df = p.merge(data_read, in_read, on=['R', 'G', 'B'], how='inner')
+            color_string = p.Series.to_string(desired_df['Color names'])
+
+            print(color_string)
+
+        else:
+            print("please insert RGB values to get Color")
+
 def call_ui():
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
@@ -127,11 +141,6 @@ def call_ui():
     MainWindow.show()
     sys.exit(app.exec_())
 
-
-def init_variable():
-    red = Ui_MainWindow.redvalue_input.text()
-    green = Ui_MainWindow.greenvalue_input.text()
-    blue = Ui_MainWindow.bluevalue_input.text()
 
 
 """def backend_stuff(red, green, blue):
