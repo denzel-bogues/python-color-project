@@ -106,15 +106,20 @@ class Ui_MainWindow(object):
         data_read = p.read_csv("colors.csv", delimiter=',', names=['Color names', 'Hex', 'R', 'G', 'B'])
         # data_red = data_read[['R', 'G', 'B']]
 
-        if self.redvalue_input.text() != "-1":
+        if self.redvalue_input.text() != "":
             R = int(self.redvalue_input.text())
+        else:
+            R = -1
 
-        if self.greenvalue_input.text() != "-1":
+        if self.greenvalue_input.text() != "":
             G = int(self.greenvalue_input.text())
+        else:
+            G = -1
 
-        if self.bluevalue_input.text() != "-1":
+        if self.bluevalue_input.text() != "":
             B = int(self.bluevalue_input.text())
-
+        else:
+            B = -1
 
         if R >= 0 and G >= 0 and B >= 0:
             userdata = [R, G, B]
