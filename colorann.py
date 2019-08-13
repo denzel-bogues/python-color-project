@@ -8,7 +8,6 @@ AppWindow.call_ui()
 
 data_read = p.read_csv("colors.csv", delimiter = ',', names=['Color names', 'Hex', 'R', 'G', 'B',])
 # data_red = data_read[['R', 'G', 'B']]
-
 R = input('Enter red value ')
 G = input('Enter greem value ')
 B = input('Enter blue value ')
